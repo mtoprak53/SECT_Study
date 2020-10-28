@@ -21,7 +21,7 @@ function makeNewImg(gifId) {
   gifDiv.append(newDiv);
 }
 
-const searchBtn = document.querySelector('#search-button')
+const searchBtn = document.querySelector('#search-button');
 searchBtn.addEventListener('click', addGif);
 
 const removeBtn = document.querySelector('#remove-button');
