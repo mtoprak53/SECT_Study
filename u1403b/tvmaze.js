@@ -77,7 +77,7 @@ async function getEpisodes(id) {
 
   // TODO: return array-of-episode-info, as described in docstring above
 
-  const res = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`);
+  const res = await axios.get(`https://api.tvmaze.com/shows/${id}/episodes`);
   const resArr = [];
   for (let epi of res.data) {
     let obj = {
