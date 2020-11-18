@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mad-Libs Home</title>
+</head>
+<body>
+  <h1>Madlibs</h1>
+  <form action="/story">
+
+    {% for item in words %}
+    <div>
+      <label for="{{item}}">{{item}}: </label>
+      <input type="text" id="{{item}}" name="{{item}}">
+    </div>
+    {% endfor %}
+
+    <button>Submit</button>
+  </form>
+  
+</body>
+</html>
