@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+  <link rel="stylesheet"
+    href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="static/app.css">
+
+  <title>{% block title %}{% endblock%}</title>
+</head>
+<body>
+  <script>0</script>
+  <nav class="navbar">
+    <a href="/">RESET</a>
+  </nav>
+
+  <div class="container m-3">
+
+    <div  id="board" class="row table justify-content-center">
+
+      <table>
+        {% for row in board %}
+        <tr>
+          {% for letter in row %}
+          <td>{{letter}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+
+    {% block content %}{% endblock%}
+
+    <div id="message" class="row justify-content-center"></div>
+
+    <div class="row justify-content-center">
+      <ul id="word-list-2"></ul>
+    </div>
+
+  </div>
+
+  <script src="http://unpkg.com/jquery"></script>
+  <script src="https://unpkg.com/axios/dist/axios.js"></script>
+  <script src="static/app.js"></script>  
+</body>
+</html>

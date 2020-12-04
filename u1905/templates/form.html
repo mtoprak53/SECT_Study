@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Boggle{% endblock %}
+
+{% block content %}
+
+  <div id="highest-score" class="row justify-content-center">
+    <p>High Score: <span id="high-score">{{high_score}}</span> in 
+      <span id="play-count">{{play_count}}</span> plays</p>
+    <button id="clear-history" class="badge badge-danger mx-3 mb-3">Clear History</button>
+  </div>
+
+  <div id="current-score" class="row justify-content-center">
+    <p>Score: <span id="score">0</span>  |  Seconds Left: <span id="timer"></span></p>
+  </div>
+
+  <div id="word-form" class="row justify-content-center">
+    <form action="/with-board" method="post">
+      <input name="word" type="text" id="word-input" autofocus>
+      <button>Add Word</button>
+    </form>
+  </div>
+
+{% endblock %}
