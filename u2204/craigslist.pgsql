@@ -1,0 +1,31 @@
+DROP DATABASE IF EXISTS craigslist;
+
+CREATE DATABASE craigslist;
+
+\c craigslist
+
+CREATE TABLE regions (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(15) UNIQUE NOT NULL
+);
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(20) UNIQUE NOT NULL,
+  region_id INTEGER REFERENCES regions ON DELETE SET NULL
+);
+
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(15) UNIQUE NOT NULL
+);
+
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(20) NOT NULL,
+  body TEXT NOT NULL,
+  user_id INTEGER REFERENCES users ON DELETE CASCADE,
+  location VARCHAR(20),
+  region_id INTEGER REFERENCES regions ON DELETE SET NULL,
+  category_id INTEGER REFERENCES categories ON DELETE NULL
+);
