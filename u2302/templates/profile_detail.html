@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+
+<h1>User Details</h1>
+
+<div class="card mb-3" style="max-width: 540px;">
+  <div class="row no-gutters">
+    <div class="col-md-4">
+      <img src={{user.image_url}} class="card-img" alt="user picture">
+    </div>
+
+    <div class="col-md-8">
+
+      <div class="card-body">
+
+        <form action="/users/{{user.id}}/delete" method="POST">
+          <h3 class="card-title">{{user.first_name}} {{user.last_name}}</h3>
+          <a href="/users/{{user.id}}/edit" role="button" class="btn btn-primary">Edit</a>
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+
+      </div>
+      <div class="card-body">
+        <h3>Posts</h3>
+        <ul>
+          {% for post in posts %}
+            <li><a href="/posts/{{post.id}}">{{post.title}}</a></li>
+          {% endfor %}
+        </ul>
+        <a href="/users/{{user.id}}/posts/new" role="button" class="btn btn-primary">Add Post</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<a href="/users" type="button" class="btn btn-outline-success">Back to the Users</a>
+{% endblock %}

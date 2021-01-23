@@ -1,0 +1,15 @@
+* {
+  font-family: 'Roboto', sans-serif;
+  /* background-color: lightblue; */
+}
+
+a {
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+#konteyn {
+  max-width: 600px;
+  border: 2px solid red;
+  background-color: aquamarine;
+}
