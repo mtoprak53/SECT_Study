@@ -1,0 +1,30 @@
+* {
+  font-family: 'Roboto', sans-serif;
+  /* background-color: lightblue; */
+}
+
+a {
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.fixed-width {
+  width: 600px;
+}
+
+.messages {
+  font-size: 2rem;
+}
+
+.success {
+  background-color: lightgreen;
+}
+
+.error {
+  background-color: rgb(255, 110, 52);
+  /* color: white; */
+}
+
+.blog-frame {
+  border: 2px solid lightskyblue;
+}
