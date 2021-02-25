@@ -13,7 +13,7 @@ class AddPetForm(FlaskForm):
         validators=[InputRequired()],
         )
 
-    species = StringField(
+    species = SelectField(
         "Species", 
         choices=[("cat", "Cat"), ("dog", "Dog"), ("porcupine", "Porcupine")],
         )

@@ -56,7 +56,7 @@ def add_pet():
 
     else:
         # re-present form for editing
-        return render_template("add_pet_form.html", form=form)
+        return render_template("pet_add_form.html", form=form)
 
 
 @app.route('/<int:pet_id>', methods=["GET", "POST"])
