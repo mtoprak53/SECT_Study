@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cupcakes</title>
+  <link rel="stylesheet" href="static/app.css">
+
+  <!-- Bootstrap CSS link -->
+  <link rel="stylesheet"
+    href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+</head>
+
+<body>
+  <div class="container">
+    
+    <h1>Cupcakes List</h1>
+
+    <ul id="cupcake-list">
+      {% for cupcake in cupcakes %}
+      <div class="m-3">
+        <li>
+          {{ cupcake.flavor }} / {{ cupcake.size }} / {{ cupcake.rating }}
+          <button class="delete-cupcake badge badge-danger" 
+                  data-id="{{ cupcake.id }}">X</button>
+        </li>
+        <img class="Cupcake-img"
+              src="{{ cupcake.image }}"
+              alt="(no image provided)">
+      </div>
+      {% endfor %}
+    </ul>
+
+    <div class="form-box p-3 mb-3 border border-dark rounded-lg">
+      <form action="post" id="add-cupcake-form">
+
+        <h2>Add New Cupcake</h2>
+
+        {% for item in [('text', 'flavor'), 
+                        ('text', 'size'), 
+                        ('number', 'rating'), 
+                        ('text', 'image')] %}
+          <div class="form-group">
+            <label for="{{ item[1] }}">{{ item[1].capitalize() }}:</label>
+            <!-- adding min and max' if type is number -->
+            <input type="{{ item[0] }}" 
+            class="form-control" 
+            id="{{ item[1] }}" 
+            name="{{ item[1] }}"
+            "{% if item[0] == 'number' %}
+              min="0" max="10"
+            {% endif %}">
+          </div>
+        {% endfor %}
+        
+        <div class="form-group row">
+          <div class="ml-auto mr-3">
+            <button type="submit" class="btn btn-success">Add Cupcake</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="http://unpkg.com/jquery"></script>
+  <script src="http://unpkg.com/axios/dist/axios.js"></script>
+  <script src="static/app.js"></script>
+</body>
+</html>
