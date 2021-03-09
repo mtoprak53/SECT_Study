@@ -85,10 +85,8 @@ def update_cupcake(id):
     cupcake.image = data['image']
 
     db.session.add(cupcake)
-    db.session.commit()g							
-g							
-
-
+    db.session.commit()
+    
     return jsonify(cupcake=cupcake.serialize())
 
 
