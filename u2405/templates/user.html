@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+{{ user.username }} Page
+{% endblock %}
+
+
+{% block content %}
+<h1 class="display-2">
+  <b>{{ user.username.capitalize() }}</b>
+</h1>
+<ul>
+  <li><b>E-mail:</b> {{ user.email }}</li>
+  <li><b>First Name:</b> {{ user.first_name }}</li>
+  <li><b>Last Name:</b> {{ user.last_name }}</li>
+</ul>
+
+<form>
+  <button class="btn btn-sm btn-info"
+          formaction="/users/{{ user.username }}/feedback/add"
+          formmethod="GET">Add Feedback
+  </button>
+  <button class="btn btn-sm btn-danger"
+          formaction="/users/{{ user.username }}/delete"
+          formmethod="POST">Delete User
+  </button>
+</form> 
+
+<div>
+  {% for feedback in feedbacks %}
+    <div class="card my-4">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">Date goes here!</h6>
+        <h5 class="card-title font-weight-bold">
+          {{ feedback.title }}
+        </h5>
+
+        <p class="card-text">{{ feedback.content }}</p>
+        
+        <div class="row">
+          <div class="ml-auto mr-3">
+            <!-- EDIT & DELETE BUTTON -->
+            <form>
+              <button class="btn btn-sm btn-outline-success ml-2"
+                      formaction="/feedback/{{ feedback.id }}/update"
+                      formmethod="GET">Edit
+              </button>
+              <button class="btn btn-sm btn-outline-danger ml-2"
+                      formaction="/feedback/{{ feedback.id }}/delete"
+                      formmethod="POST"><i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  {% endfor %}
+
+</div>
+
+{% endblock %}
