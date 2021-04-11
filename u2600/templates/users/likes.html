@@ -1,0 +1,27 @@
+{% extends 'users/detail.html' %}
+ 
+{% block user_details %}
+  <div class="col-sm-6">
+    <ul class="list-group" id="messages">
+
+      {% for like in likes %}
+
+        <li class="list-group-item">
+          <a href="/messages/{{ like.id }}" class="message-link"/>
+
+          <a href="/users/{{ like.user.id }}">
+            <img src="{{ like.user.image_url }}" alt="user image" class="timeline-image">
+          </a>
+
+          <div class="message-area">
+            <a href="/users/{{ like.user.id }}">@{{ like.user.username }}</a>
+            <span class="text-muted">{{ like.timestamp.strftime('%d %B %Y') }}</span>
+            <p>{{ like.text }}</p>
+          </div>
+        </li>
+
+      {% endfor %}
+
+    </ul>
+  </div>
+{% endblock %}
