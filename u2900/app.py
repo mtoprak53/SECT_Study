@@ -5,27 +5,40 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 # from forms import SomeForm   #  <<== ENTER FORMS
-# from models import SomeModel   #  <<== ENTER MODELS
+from models import db, connect_db, Food
+from secrets import API_SECRET_KEY
 
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = (
-#     os.environ.get("DATABASE_URL", "postgres:///some_db")   #  <<== ENTER DATABASE
-# )
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    os.environ.get("DATABASE_URL", "postgresql:///calorie_db")
+)
 
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# app.config["SQLALCHEMY_ECHO"] = False
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = True
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "It is a secret.")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ECHO"] = True
+app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", API_SECRET_KEY)
 toolbar = DebugToolbarExtension(app)
 
-# connect_db(app)
+connect_db(app)
 
 
 ####################################################################################
 # 
+
+@app.route('/add-food/<food_name>', methods=["POST"])
+def add_food(food_name):
+    """x"""
+
+    food = Food(name=food_name, amount=100)
+    db.session.add(food)
+    db.session.commit()
+    print("NABER!!")
+    print("NABER-2!!")
+
+    return f"{food_name} added!"
 
 
 ####################################################################################

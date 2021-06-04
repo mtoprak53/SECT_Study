@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserUpdateForm
 from models import db, connect_db, User, Message, Likes, Follows
-b
+
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
