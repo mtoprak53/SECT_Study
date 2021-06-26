@@ -1,3 +1,4 @@
+# from github_SECT.u2900.product_search import ENDPOINT
 import os
 import requests
 
@@ -9,6 +10,7 @@ from forms import UserAddForm, LoginForm
 from models import db, connect_db, Food, FoodLog, User, UserInfo
 
 from hidden import API_KEY
+from product_search import product_search
 
 CURR_USER_KEY = "curr_user"
 
@@ -161,49 +163,56 @@ def food_search():
     if request.form:
         food = request.form["food"]
 
-        print("#"*30)
-        print(food)
-        print("#"*30)
+        # print("#"*30)
+        # print(food)
+        # print("#"*30)
 
-        ENDPOINT = '/products'
-        url = BASE_URL + ENDPOINT
+        ENDPOINT = '/products/_search'
+        # url = BASE_URL + ENDPOINT
 
-        print("#"*30)
-        print(url)
-        print("#"*30)
+        # print("#"*30)
+        # print(url)
+        # print("#"*30)
 
-        query = {
-            "query": {
-                "wildcard": {
-                    "_all_names" : f"*{food}*"
-                }
-            }
-        }
+        # query = {
+        #     "query": {
+        #         "wildcard": {
+        #             "_all_names" : f"*{food}*"
+        #         }
+        #     }
+        # }
 
-        headers = {
-            'Authorization': 'Token token=' + API_KEY,
-            'Accept': 'application/json',
-            'Content-Type': 'application/vnd.api+json',
-            'Accept-Encoding': 'gzip,deflate'
-        }
+        # headers = {
+        #     'Authorization': 'Token token=' + API_KEY,
+        #     'Accept': 'application/json',
+        #     'Content-Type': 'application/vnd.api+json',
+        #     'Accept-Encoding': 'gzip,deflate'
+        # }
 
-        r = requests.post(url, json=query, headers=headers)
+        r = product_search(BASE_URL, ENDPOINT, API_KEY, food)
+
+        # r = requests.post(url, json=query, headers=headers)
         if r.status_code == 200:
             results = r.json()
-            return render_template('results.html', results=results)
+            # return results
+            # return render_template('results.html', results=results)
         else:
             # return render_template('results.html', status_code=r.status_code)
 
             print("#"*30)
-            print(r)
+            print(r.__repr__())
             print("#"*30)
+            print(r.json())
+            print("#"*30)
+            print(dir(r))
 
             return render_template('results.html', r=r)
 
 
 
         # return f"Searched food is {food}"
-        return render_template('results.html', results=results)
+        # return render_template('results.html', results=results)
+        return render_template('results.html', results=results, food=food)
 
     return render_template('search.html')
 

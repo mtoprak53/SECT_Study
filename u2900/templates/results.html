@@ -12,11 +12,13 @@
   <h3>Number of products found: {{ results['hits']['total'] }}</h3>
 
   <h3>First few products...</h3>
-  <ul>
+  <ol>
     {% for hit in results['hits']['hits'] %}
-      <li>{{ hit['_source']['display_name_translations']['en'] }}</li>
+      <li>{{ hit['_source']['name_translations']['en'] }}</li>
     {% endfor %}
-  </ul>
+  </ol>
+
+  <p>{{ results }}</p>
 
 {% else %}
 
