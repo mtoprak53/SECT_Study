@@ -9,17 +9,19 @@ from sqlalchemy.exc import IntegrityError   # for already taken usernames
 from forms import UserAddForm, LoginForm
 from models import db, connect_db, Food, FoodLog, User, UserInfo
 
-from hidden import API_KEY
-from product_search import product_search
+from hidden import CONSUMER_KEY, CONSUMER_SECRET
+# from product_search import product_search
 
 CURR_USER_KEY = "curr_user"
 
-BASE_URL = "https://www.foodrepo.org/api/v3"
+# BASE_URL = "https://www.foodrepo.org/api/v3"
+
+BASE_URL = "https://platform.fatsecret.com/rest/server.api"
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    os.environ.get("DATABASE_URL", "postgresql:///calorie_db")
+    os.environ.get("DATABASE_URL", "postgresql:///calorie_db_2")
 )
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

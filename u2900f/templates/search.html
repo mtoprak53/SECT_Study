@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block body_class %}{% endblock %}
+
+
+{% block content %}
+
+
+<div class="row justify-content-md-center">
+  <div class="col-md-7 col-lg-5">
+    
+    <form method="POST" id="search-form">
+      <input name="food" type="text" class="w-75" placeholder="Enter Food">
+      <button class="btn btn-sm btn-primary px-3">Search</button>
+    </form>
+  </div>
+</div>
+
+
+{% endblock %}
