@@ -7,3 +7,11 @@ div {
 .tiny-image {
   max-width: 30px
 }
+
+.hidden {
+  visibility: hidden;
+}
+
+.disabled {
+  pointer-events: none;
+}

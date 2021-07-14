@@ -1,4 +1,3 @@
-# from github_SECT.u2900.product_search import ENDPOINT
 import os
 import requests
 
@@ -6,17 +5,24 @@ from flask import Flask, redirect, render_template, request, flash, session, g, 
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError   # for already taken usernames
 
+from datetime import date, timedelta
+from fatsecret import Fatsecret
+
 from forms import UserAddForm, LoginForm
-from models import db, connect_db, Food, FoodLog, User, UserInfo
+from models import db, connect_db, Food, FoodInfo, FoodLog, User, UserInfo, find_the_date
 
 from hidden import CONSUMER_KEY, CONSUMER_SECRET
-# from product_search import product_search
 
+TODAY = date.today()
+
+# CREATE SESSION KEYS
 CURR_USER_KEY = "curr_user"
+DATE_KEY = "the_date"
+SEARCH_KEY = "search_term"
+PAGE_NUM_KEY = "page_num"
+FOOD_KEY = "food"
 
-# BASE_URL = "https://www.foodrepo.org/api/v3"
-
-BASE_URL = "https://platform.fatsecret.com/rest/server.api"
+# BASE_URL = "https://platform.fatsecret.com/rest/server.api"
 
 app = Flask(__name__)
 
@@ -33,13 +39,14 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
+fs = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET)
+
 # db.drop_all()
 # db.create_all()
 
 
 ####################################################################################
 # User signup/login/logout
-
 
 @app.before_request
 def add_user_to_g():
@@ -143,86 +150,400 @@ def logout():
 ####################################################################################
 # 
 
+@app.route('/home', methods=["GET", "POST"])
+def homepage():
+    """We start here!"""
+    
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
 
-@app.route('/add-food/<food_name>', methods=["POST"])
-def add_food(food_name):
-    """x"""
+    # BUILD THE EATEN LIST IF THERE IS ANY LOG
+    if FoodLog.query.filter(
+        FoodLog.user_id == g.user.id,
+        FoodLog.date == THE_DATE
+    ).count() > 0:
+        dates_foodlog = FoodLog.query.filter(
+                        FoodLog.user_id == g.user.id,
+                        FoodLog.date == THE_DATE
+                    ).all()
 
-    food = Food(name=food_name, amount=100)
-    db.session.add(food)
-    db.session.commit()
-    print("NABER!!")
-    print("NABER-2!!")
+        for df in dates_foodlog:
+            df.calories = round(df.calories)
 
-    return f"{food_name} added!"
+        calorie_list = [df.calories for df in dates_foodlog]
+        calorie_sum = sum(calorie_list)
+
+        calorie_limit = g.user.userinfo[0].calorie_limit 
+        calorie_need = g.user.userinfo[0].calorie_need
+
+        return render_template(
+            'home.html', 
+            user=g.user, 
+            today=TODAY, 
+            the_date=THE_DATE, 
+            foodlog=dates_foodlog,
+            calorie_sum=calorie_sum,
+            calorie_limit=calorie_limit,
+            calorie_need=calorie_need,
+        )
+
+    calorie_sum = 0
+    calorie_limit = g.user.userinfo[0].calorie_limit 
+    calorie_need = g.user.userinfo[0].calorie_need
+
+    return render_template(
+        'home.html', 
+        user=g.user, 
+        today=TODAY,
+        the_date=THE_DATE, 
+        calorie_sum=calorie_sum,
+        calorie_limit=calorie_limit,
+        calorie_need=calorie_need,
+    )
 
 
-@app.route('/food-search', methods=["GET", "POST"])
-def food_search():
+@app.route('/food/search', methods=["POST"])
+def search_food():
+    """Redirect the search term as a query to the next route."""
+    
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    food = request.form["food"]
+    try:
+        food_list = fs.foods_search(food)
+
+    except:
+        return render_template(
+            'error_food.html', 
+            user=g.user, 
+            today=TODAY, 
+            the_date=THE_DATE, 
+            search_term=food, 
+        )
+
+    else:
+        return redirect(f"/food/search/{food}/{0}")
+
+
+@app.route('/food/search/<food>/<int:page_num>')
+def search_food_redirect(food, page_num):
     """
-    """    
+    """
+    
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    # FORM THE 10 PAGE LINKS LIST (HIDDEN) ###########
+    if page_num < 5:
+        pages = range(1,10)
+    else:
+        pages = range(page_num-3, page_num+6)
+    ##################################################
+
+    max_results = 20
+    
+    food_list = fs.foods_search(
+        food, 
+        page_number=page_num, 
+        max_results=max_results
+    )
+
+    try:
+        # MANY RESULTS
+        food_list[0].get('food_id')
+
+    except:
+        # ONLY ONE RESULT
+        food_list=[food_list]
+    
+    return render_template(
+        'search_results.html', 
+        user=g.user, 
+        today=TODAY,
+        the_date=THE_DATE,
+        food_list=food_list, 
+        search_term=food,
+        page_number=page_num,
+        pages=pages, 
+    )
+
+
+@app.route('/food/add/<int:food_id>', methods=["GET", "POST"])
+def add_food(food_id):
+    """takes the chosen food and calculates its values
+    """
+    
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    # POST
+    if request.form:
+    
+        amount = float(request.form["amount"])
+        servings = request.form["servings"]
+        foodinfo = session[FOOD_KEY]
+        food_id = int(foodinfo['food_id'])
+
+        # DATABASE REGISTERING OF FOOD & ITS INFO #
+        if Food.query.get(food_id):
+
+            # IF THE FOOD IS ALREADY IN DATABASE
+            pass
+
+        else:
+
+            # IF THE FOOD IS NOT IN DATABASE YET
+            if foodinfo.get('brand_name'):
+                brand = foodinfo.get('brand_name')
+            else:
+                brand = 'Generic'
+
+            food = Food(
+                id=food_id,
+                name=foodinfo['food_name'],
+                brand=brand,
+                food_url=foodinfo['food_url']
+            )
+
+            db.session.add(food)
+            db.session.commit()
+
+            serv = foodinfo['servings']['serving']
+
+            # SEND FOOD INFO TO LOCAL DATABASE
+            try:
+                # ONE SERVING
+                serv.get('fat')
+                food_info = FoodInfo(food_id=food_id, **serv)
+            
+                db.session.add(food_info)
+                db.session.commit()
+
+            except:
+                # LIST SERVING
+                for s in serv:
+                    food_info = FoodInfo(food_id=food_id, **s)
+
+                    db.session.add(food_info)
+                    db.session.commit()
+        
+        # SEND FOOD-LOG TO DATABASE
+        try:
+            foodinfo_0 = FoodInfo.query.filter(
+                FoodInfo.food_id == food_id,
+                FoodInfo.serving_description == servings
+            ).one()
+        except:
+            return render_template(
+                        'error_db.html', 
+                        user=g.user, 
+                        today=TODAY,
+                        the_date=THE_DATE, 
+                    )
+
+        unit_calories = foodinfo_0.calories
+        calories = amount * unit_calories
+
+        if servings == '100 g':
+            calories /= 100
+        
+        foodlog = FoodLog(
+            user_id=g.user.id,
+            food_id=food_id,
+            amount=amount,
+            serving_description=servings, 
+            unit_calories=unit_calories,
+            calories=calories,
+        )
+
+        db.session.add(foodlog)
+        db.session.commit()
+
+        return redirect('/home')
+
+
+    # GET
+    food_info = fs.food_get(food_id)
+    serving_val = food_info['servings']['serving']
+    is_it_list = isinstance(serving_val, list)
+
+    # IF THERE IS A LIST OF SERVINGS
+    if is_it_list:
+
+        SDs = []
+        for serv in serving_val:
+
+            SDs.append(serv['serving_description'])
+
+            if serv['serving_description'] == '100 g':
+                unit_amount = serv['serving_description']
+                unit_kcal = serv['calories']
+
+    # IF THERE IS ONLY ONE SERVING
+    else:
+        SDs = [serving_val['serving_description']]
+        unit_amount = serving_val['serving_description']
+        unit_kcal = serving_val['calories']
+
+    # FIND OUT THE DATE
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    session[FOOD_KEY] = food_info
+
+    return render_template(
+        'add_food.html', 
+        SDs=SDs, 
+        unit_kcal=unit_kcal, 
+        unit_amount=unit_amount.upper(), 
+        food_info=food_info, 
+        the_date=THE_DATE,
+        user=g.user, 
+        today=TODAY,
+    )
+
+
+@app.route('/food/log/<int:log_id>/edit', methods=["GET", "POST"])
+def edit_food(log_id):
+    """
+    """
+    
+    # POST METHOD
+    if request.form:
+        amount = float(request.form["amount"])
+
+        TODAY = date.today()
+        THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+        log = FoodLog.query.get_or_404(log_id)
+        log.amount = amount
+        log.calories = log.amount * log.unit_calories
+
+        if log.serving_description == '100 g':
+            log.calories /= 100
+
+        db.session.commit()
+
+        return redirect('/home')
+
+    # GET METHOD
+
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    log = FoodLog.query.get_or_404(log_id)
+
+    return render_template(
+                'edit_food.html',
+                user=g.user, 
+                the_date=THE_DATE,
+                today=TODAY,
+                log=log
+            )
+
+
+@app.route('/food/log/<int:log_id>/delete', methods=["POST"])
+def delete_food(log_id):
+    """
+    """
+
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    log = FoodLog.query.get_or_404(log_id)
+    
+    db.session.delete(log)
+    db.session.commit()
+
+    return redirect('/home')
+
+
+@app.route('/food/frequent')
+def frequent_foods():
+    """
+    """
+
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+
+    # USER'S ALL FOOD-LOGS
+    all_logs = FoodLog.query.filter_by(user_id=g.user.id).all()
+
+    # FOOD-IDs OF USER'S FOOD-LOGS
+    food_ids = [log.food_id for log in all_logs]
+    fid_set = set(food_ids)
+
+    # (FOOD-ID, FREQUENCY) TUPLES LIST
+    food_freq = [(fid, FoodLog.query.filter(FoodLog.user_id==g.user.id, FoodLog.food_id==fid).count()) for fid in fid_set]
+
+    # REVERSE SORTED (FOOD-ID, FREQUENCY) TUPLES LIST
+    ffs = sorted(food_freq, key=lambda x: x[1], reverse=True)
+
+    fids20 = [t[0] for t in ffs[:20]]
+
+    fidlogs = 
+
+    foodlogs = [FoodLog.query.filter(FoodLog.user_id==g.user.id, FoodLog.food_id==fid).all() for fid in fids20]
+
+
+
+
+
+
+@app.route('/calendar', methods=["GET", "POST"])
+def change_date():
+    """
+    """
+
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
 
     if request.form:
-        food = request.form["food"]
 
-        # print("#"*30)
-        # print(food)
-        # print("#"*30)
+        the_date = request.form["chosen_date"]
+        session[DATE_KEY] = the_date
 
-        ENDPOINT = '/products/_search'
-        # url = BASE_URL + ENDPOINT
+        return redirect('/home')
 
-        # print("#"*30)
-        # print(url)
-        # print("#"*30)
-
-        # query = {
-        #     "query": {
-        #         "wildcard": {
-        #             "_all_names" : f"*{food}*"
-        #         }
-        #     }
-        # }
-
-        # headers = {
-        #     'Authorization': 'Token token=' + API_KEY,
-        #     'Accept': 'application/json',
-        #     'Content-Type': 'application/vnd.api+json',
-        #     'Accept-Encoding': 'gzip,deflate'
-        # }
-
-        r = product_search(BASE_URL, ENDPOINT, API_KEY, food)
-
-        # r = requests.post(url, json=query, headers=headers)
-        if r.status_code == 200:
-            results = r.json()
-            # return results
-            # return render_template('results.html', results=results)
-        else:
-            # return render_template('results.html', status_code=r.status_code)
-
-            print("#"*30)
-            print(r.__repr__())
-            print("#"*30)
-            print(r.json())
-            print("#"*30)
-            print(dir(r))
-
-            return render_template('results.html', r=r)
+    return render_template(
+        'choose_date.html', 
+        user=g.user, 
+        today=TODAY,
+        the_date=THE_DATE,
+    )
 
 
+@app.route('/day-change/<direction>/<int:days>')
+def change_day(direction, days):
+    """X"""
 
-        # return f"Searched food is {food}"
-        # return render_template('results.html', results=results)
-            
-        # WEBPAGE RETURN
-        # return render_template('results.html', results=results, food=food)
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
 
-        # JSON RETURN
-        return results
+    t1 = timedelta(days)
+    if direction == 'post':
+        THE_DATE += t1
+    elif direction == 'pre':
+        THE_DATE -= t1
+    else:
+        return render_template(
+            '/error_date.html',
+            user=g.user, 
+            today=TODAY,
+            the_date=THE_DATE,
+        )
+    session[DATE_KEY] = THE_DATE.isoformat()
 
-    return render_template('search.html')
-
+    return redirect('/home')
 
 
 ####################################################################################
@@ -233,22 +554,14 @@ def food_search():
 # Homepage and error pages
 
 
-@app.route('/')
-def homepage():
-    """Show homepage"""
+@app.route('/', methods=["GET", "POST"])
+def route():
+    """Show welcome page"""
 
     if g.user:
-        print("#"*30)
-        print(f"g.user => {g.user}")
-        print("#"*30)
-
-        # user = User.query.get(g.user)
-        # print("#"*30)
-        # print(f"user => {user}")
-        # print("#"*30)
-
-        # user = g.user
-        return render_template('home.html', user=g.user)
+        if DATE_KEY in session:
+            del session[DATE_KEY]
+        return redirect('/home')
     else:
         return render_template('home-anon.html')
 
@@ -275,42 +588,3 @@ def page_not_found(e):
 #     req.headers["Expires"] = "0"    
 #     req.headers["Cache-Control"] = "public, max-age=0"
 #     return req
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
