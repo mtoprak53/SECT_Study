@@ -1,6 +1,6 @@
 """SQLAlchemy models for Calorie Counter"""
 
-from datetime import datetime, date
+from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
@@ -336,18 +336,18 @@ class User(db.Model):
 ###########################################################
 # MY FUNCTIONS:
 
-def find_the_date(DATE_KEY, TODAY, session):
-    """
-    IF ANOTHER DATE IS BEING MODIFIED
-    session[DATE_KEY] HAS IT AS ISO
-    IF TODAY IS BEING MODIFIED session[DATE_KEY] IS EMPTY
-    THE_DATE HAS THE DATE HAS BEEN MODIFIED
-    """
+# def find_the_date(DATE_KEY, TODAY, session):
+#     """
+#     IF ANOTHER DATE IS BEING MODIFIED
+#     session[DATE_KEY] HAS IT AS ISO
+#     IF TODAY IS BEING MODIFIED session[DATE_KEY] IS EMPTY
+#     THE_DATE HAS THE DATE HAS BEEN MODIFIED
+#     """
 
-    if DATE_KEY in session:
-        return date.fromisoformat(session[DATE_KEY])
-    else:
-        return TODAY
+#     if DATE_KEY in session:
+#         return date.fromisoformat(session[DATE_KEY])
+#     else:
+#         return TODAY
     
 
 

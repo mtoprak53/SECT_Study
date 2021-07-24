@@ -7,6 +7,7 @@ chardet==4.0.0
 click==7.1.2
 dnspython==2.1.0
 email-validator==1.1.2
+fatsecret==0.2.3
 Flask==1.1.2
 Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.10
@@ -21,7 +22,9 @@ MarkupSafe==1.1.1
 psycopg2-binary==2.8.6
 pycodestyle==2.7.0
 pycparser==2.20
+rauth==0.7.3
 requests==2.25.1
+schedule==1.1.0
 six==1.15.0
 SQLAlchemy==1.4.12
 toml==0.10.2

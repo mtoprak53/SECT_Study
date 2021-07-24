@@ -1,25 +1,27 @@
+# PYTHON MODULES
 import os
-import requests
+from datetime import date, timedelta
 
+# FLASK MODULES
 from flask import Flask, redirect, render_template, request, flash, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError   # for already taken usernames
 
-from datetime import date, timedelta
+# SPECIAL MODULES
 from fatsecret import Fatsecret
 
+# MY MODULES
 from forms import UserAddForm, LoginForm
-from models import db, connect_db, Food, FoodInfo, FoodLog, User, UserInfo, find_the_date
+from models import db, connect_db, Food, FoodInfo, FoodLog, User, UserInfo
+from hidden import CONSUMER_KEY, CONSUMER_SECRET, DATABASE_URL
 
-from hidden import CONSUMER_KEY, CONSUMER_SECRET
-
-TODAY = date.today()
+# TODAY = date.today()
 
 # CREATE SESSION KEYS
 CURR_USER_KEY = "curr_user"
 DATE_KEY = "the_date"
-SEARCH_KEY = "search_term"
-PAGE_NUM_KEY = "page_num"
+# SEARCH_KEY = "search_term"
+# PAGE_NUM_KEY = "page_num"
 FOOD_KEY = "food"
 
 # BASE_URL = "https://platform.fatsecret.com/rest/server.api"
@@ -27,7 +29,7 @@ FOOD_KEY = "food"
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    os.environ.get("DATABASE_URL", "postgresql:///calorie_db_2")
+    os.environ.get(DATABASE_URL, "postgresql:///calorie_db_2")
 )
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -49,7 +51,7 @@ fs = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET)
 # User signup/login/logout
 
 @app.before_request
-def add_user_to_g():
+def add_user_to_g():   # WHERE IS THIS USED?
     """If we're logged in, add curr_user to Flask global."""
 
     if CURR_USER_KEY in session:
@@ -69,6 +71,18 @@ def do_logout():
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
+
+def load_the_date():
+    """Load the date."""
+
+    return date.fromisoformat(session[DATE_KEY])
+
+
+def save_(the_date):
+    """Save the date."""
+
+    session[DATE_KEY] = the_date.isoformat()
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -153,10 +167,14 @@ def logout():
 @app.route('/home', methods=["GET", "POST"])
 def homepage():
     """We start here!"""
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
     
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     # BUILD THE EATEN LIST IF THERE IS ANY LOG
     if FoodLog.query.filter(
@@ -206,10 +224,14 @@ def homepage():
 @app.route('/food/search', methods=["POST"])
 def search_food():
     """Redirect the search term as a query to the next route."""
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
     
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     food = request.form["food"]
     try:
@@ -232,10 +254,14 @@ def search_food():
 def search_food_redirect(food, page_num):
     """
     """
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
     
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     # FORM THE 10 PAGE LINKS LIST (HIDDEN) ###########
     if page_num < 5:
@@ -276,10 +302,14 @@ def search_food_redirect(food, page_num):
 def add_food(food_id):
     """takes the chosen food and calculates its values
     """
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
     
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     # POST
     if request.form:
@@ -390,20 +420,17 @@ def add_food(food_id):
         unit_amount = serving_val['serving_description']
         unit_kcal = serving_val['calories']
 
-    # FIND OUT THE DATE
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
-
     session[FOOD_KEY] = food_info
 
     return render_template(
         'add_food.html', 
+        user=g.user, 
+        today=TODAY, 
+        the_date=THE_DATE,
         SDs=SDs, 
         unit_kcal=unit_kcal, 
         unit_amount=unit_amount.upper(), 
         food_info=food_info, 
-        the_date=THE_DATE,
-        user=g.user, 
-        today=TODAY,
     )
 
 
@@ -411,13 +438,18 @@ def add_food(food_id):
 def edit_food(log_id):
     """
     """
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
+
+    # FIND OUT THE DATE
+    TODAY = date.today()
+    THE_DATE = load_the_date()
     
     # POST METHOD
     if request.form:
         amount = float(request.form["amount"])
-
-        TODAY = date.today()
-        THE_DATE = find_the_date(DATE_KEY, TODAY, session)
 
         log = FoodLog.query.get_or_404(log_id)
         log.amount = amount
@@ -431,11 +463,6 @@ def edit_food(log_id):
         return redirect('/home')
 
     # GET METHOD
-
-    # FIND OUT THE DATE
-    TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
-
     log = FoodLog.query.get_or_404(log_id)
 
     return render_template(
@@ -452,9 +479,11 @@ def delete_food(log_id):
     """
     """
 
-    # FIND OUT THE DATE
-    TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
+
+    # NO NEED TO FIND OUT THE DATE
 
     log = FoodLog.query.get_or_404(log_id)
     
@@ -464,14 +493,19 @@ def delete_food(log_id):
     return redirect('/home')
 
 
+### UNDER CONSTRUCTION ###
 @app.route('/food/frequent')
 def frequent_foods():
     """
     """
 
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
+
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     # USER'S ALL FOOD-LOGS
     all_logs = FoodLog.query.filter_by(user_id=g.user.id).all()
@@ -488,12 +522,9 @@ def frequent_foods():
 
     fids20 = [t[0] for t in ffs[:20]]
 
-    fidlogs = 
+    # fidlogs = 
 
     foodlogs = [FoodLog.query.filter(FoodLog.user_id==g.user.id, FoodLog.food_id==fid).all() for fid in fids20]
-
-
-
 
 
 
@@ -502,14 +533,18 @@ def change_date():
     """
     """
 
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
+
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     if request.form:
 
         the_date = request.form["chosen_date"]
-        session[DATE_KEY] = the_date
+        save_(the_date)
 
         return redirect('/home')
 
@@ -525,9 +560,13 @@ def change_date():
 def change_day(direction, days):
     """X"""
 
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
+
     # FIND OUT THE DATE
     TODAY = date.today()
-    THE_DATE = find_the_date(DATE_KEY, TODAY, session)
+    THE_DATE = load_the_date()
 
     t1 = timedelta(days)
     if direction == 'post':
@@ -541,7 +580,8 @@ def change_day(direction, days):
             today=TODAY,
             the_date=THE_DATE,
         )
-    session[DATE_KEY] = THE_DATE.isoformat()
+
+    save_(THE_DATE)
 
     return redirect('/home')
 
@@ -559,8 +599,8 @@ def route():
     """Show welcome page"""
 
     if g.user:
-        if DATE_KEY in session:
-            del session[DATE_KEY]
+        THE_DATE = date.today()
+        save_(THE_DATE)
         return redirect('/home')
     else:
         return render_template('home-anon.html')
@@ -569,6 +609,10 @@ def route():
 @app.errorhandler(404)
 def page_not_found(e):
     """404 NOT FOUND page."""
+
+    # CHECK IF THE USER LOGGED IN
+    if not session.get(CURR_USER_KEY):
+        return redirect('/')
 
     return render_template('404.html'), 404
 
