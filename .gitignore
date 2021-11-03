@@ -148,9 +148,15 @@ u4700/4707/solution/
 
 u4700/4708/0_downz/
 u4700/4708/1_lesson/
-u4700/4708/exercise/dsa-trees/0_others/
-u4700/4708/exercise/dsa-trees/package-lock.json
+# u4700/4708/exercise/dsa-trees/0_others/
+# u4700/4708/exercise/dsa-trees/package-lock.json
 u4700/4708/solution/
+
+u4700/4709/0_downz/
+u4700/4709/1_lesson/
+# u4700/4709/exercise/dsa-bsts/0_others/
+# u4700/4709/exercise/dsa-bsts/package-lock.json
+u4700/4709/solution/
 
 
 

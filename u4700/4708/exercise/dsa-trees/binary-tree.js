@@ -171,7 +171,6 @@ class BinaryTree {
       }      
     }
     return nextLarger;
-
   }
 
   /** Further study!
