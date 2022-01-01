@@ -24,7 +24,20 @@ u1600/exercise/hack-or-snooze-ajax-api/test/
 # Unit - 29
 
 u2900/
+# u2900/venv/
+# .vscode/
+# __pycache__/
+# runtime.txt
+# hidden.py
 u2900f/
+# u2900f/venv/
+# .vscode/
+# __pycache__/
+# runtime.txt
+# hidden.py
+# oldies_01/
+# redundant/
+# python-getting-started/
 
 
 # Unit - 30
