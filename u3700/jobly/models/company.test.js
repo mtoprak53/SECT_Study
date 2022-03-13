@@ -85,6 +85,94 @@ describe("findAll", function () {
       },
     ]);
   });
+
+  test("works: nameLike filter", async function () {
+    let companies = await Company.findAll({ nameLike: "3" });
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      }
+    ]);
+  });
+
+  test("works: min & max employees filter", async function () {
+    let companies = await Company.findAll({
+      minEmployees: 1,
+      maxEmployees: 2
+    });
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  test("fails: min & max employees filter", async function () {
+    try {
+      await Company.findAll({
+        minEmployees: 2,
+        maxEmployees: 1
+      });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("works: nameLike, min & max employees filter", async function () {
+    let companies = await Company.findAll({
+      nameLike: "2",
+      minEmployees: 1,
+      maxEmployees: 2
+    });
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  test("fails: nameLike, min & max employees filter", async function () {
+    try {
+      await Company.findAll({
+        nameLike: "2",
+        minEmployees: 2,
+        maxEmployees: 1
+      });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  // test("works: no filter", async function () {
+  //   let companies = await Company.findAll();
+  //   expect(companies).toEqual();
+  // });
+
+  // test("works: no filter", async function () {
+  //   let companies = await Company.findAll();
+  //   expect(companies).toEqual();
+  // });
 });
 
 /************************************** get */

@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, difference } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -49,16 +49,65 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
-    const companiesRes = await db.query(
-          `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           ORDER BY name`);
-    return companiesRes.rows;
+  static async findAll(queryString) {
+    let querySql = `SELECT handle, 
+                             name, 
+                             description, 
+                             num_employees AS "numEmployees", 
+                             logo_url AS "logoUrl" 
+                             FROM companies`
+
+    // NO FILTER
+    if (!queryString) {
+      querySql += ` ORDER BY name`;
+      const companiesRes = await db.query(querySql);
+      return companiesRes.rows;
+    }
+
+    // WITH FILTER
+    else {
+      const keys = Object.keys(queryString);
+      const arr = ["WHERE", "AND", "AND"];
+      const universe = new Set(["nameLike", "minEmployees", "maxEmployees"]);
+
+      // BadRequestError if there is any inappropriate filter terms
+      const set1 = new Set(keys);
+      // console.log(set1);
+      // console.log(universe);
+      // console.log(difference(set1, universe));
+      if (difference(set1, universe).size > 0) {
+        throw new BadRequestError("There is at least one inappropriate filtering term in the query.");
+      }
+
+      // BadRequestError if minEmployees > maxEmployees
+      if (keys.includes("minEmployees") && 
+          keys.includes("maxEmployees") && 
+          queryString["minEmployees"] > queryString["maxEmployees"]) {
+        throw new BadRequestError("minEmployees cannot exceed maxEmployees.");
+      }
+
+      // Build the SQL query
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] === "nameLike") {
+          querySql += ` ${arr[i]} LOWER(name) LIKE LOWER($${i+1})`;
+        }
+        if (keys[i] === "minEmployees") {
+          querySql += ` ${arr[i]} num_employees >= $${i+1}`;
+        }
+        if (keys[i] === "maxEmployees") {
+          querySql += ` ${arr[i]} num_employees <= $${i+1}`;
+        }
+      }
+
+      querySql += ` ORDER BY name`;
+      // console.log(querySql);
+      // console.log(Object.values(queryString));
+      const valArr = Object.entries(queryString).map(ent => {
+        return ent[0] === "nameLike" ? `%${ent[1]}%` : parseInt(ent[1]);
+      });
+      const companiesRes = await db.query(querySql, valArr);
+      return companiesRes.rows;
+    }
   }
 
   /** Given a company handle, return data about company.
