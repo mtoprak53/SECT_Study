@@ -1,8 +1,10 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, difference } = require("../helpers/sql");
+const { BadRequestError, 
+        NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate, 
+        difference } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -51,11 +53,11 @@ class Company {
 
   static async findAll(queryString) {
     let querySql = `SELECT handle, 
-                             name, 
-                             description, 
-                             num_employees AS "numEmployees", 
-                             logo_url AS "logoUrl" 
-                             FROM companies`
+                           name,
+                           description, 
+                           num_employees AS "numEmployees", 
+                           logo_url AS "logoUrl" 
+                    FROM companies`
 
     // NO FILTER
     if (!queryString) {
