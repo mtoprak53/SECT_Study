@@ -11,6 +11,9 @@ const {
   commonBeforeEach,
   commonAfterEach, 
   commonAfterAll,
+  jobId1, 
+  jobId2,
+  jobId3
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -67,7 +70,8 @@ describe("findAll", function () {
     let jobs = await Job.findAll();
     expect(jobs).toEqual([
       {
-        id: expect.any(Number),
+        // id: expect.any(Number),
+        id: jobId1,
         title: "j1",
         salary: 100000,
         equity: "0.01",
@@ -75,10 +79,57 @@ describe("findAll", function () {
         companyHandle: "c1"
       },
       {
+        // id: expect.any(Number),
+        id: jobId2,
+        title: "j2",
+        salary: 200000,
+        equity: null,
+        // equity: 0.02,
+        companyHandle: "c2"
+      },
+      {
+        // id: expect.any(Number),
+        id: jobId3,
+        title: "j3",
+        salary: 300000,
+        equity: "0.03",
+        // equity: 0.03,
+        companyHandle: "c3"
+      },
+    ]);
+  });
+
+  test("works: title filter", async function () {
+    let jobs = await Job.findAll({ title: "3" });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300000,
+        equity: "0.03",
+        // equity: 0.03,
+        companyHandle: "c3"
+      },
+    ]);
+  });
+
+  test("fails: title filter - wrong value type", async function () {
+    try {
+      await Job.findAll({ title: true });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("works: minSalary filter", async function () {
+    let jobs = await Job.findAll({ minSalary: 200000 });
+    expect(jobs).toEqual([
+      {
         id: expect.any(Number),
         title: "j2",
         salary: 200000,
-        equity: "0.02",
+        equity: null,
         // equity: 0.02,
         companyHandle: "c2"
       },
@@ -93,7 +144,102 @@ describe("findAll", function () {
     ]);
   });
 
-  // TODO  =>  FILTERING TESTS
+  test("fails: minSalary filter - wrong value type", async function () {
+    try {
+      await Job.findAll({ minSalary: "not-a-number" });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("works: hasEquity filter", async function () {
+    let jobs = await Job.findAll({ hasEquity: true });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j1",
+        salary: 100000,
+        equity: "0.01",
+        // equity: 0.01,
+        companyHandle: "c1"
+      },
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300000,
+        equity: "0.03",
+        // equity: 0.03,
+        companyHandle: "c3"
+      },
+    ]);
+  });
+
+  test("fails: hasEquity filter - wrong value type", async function () {
+    try {
+      await Job.findAll({ hasEquity: 18 });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  // console.log(idArr);
+  test("works: all filter terms", async function () {
+    let jobs = await Job.findAll({
+      title: "j",
+      minSalary: 200000,
+      hasEquity: true
+    });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300000,
+        equity: "0.03",
+        // equity: 0.03,
+        companyHandle: "c3"
+      },
+    ]);
+  });
+
+  // console.log(idArr);
+  test("works: some filter terms in different order", async function () {
+    let jobs = await Job.findAll({
+      minSalary: 200000,
+      title: "j",
+    });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "j2",
+        salary: 200000,
+        equity: null,
+        // equity: 0.02,
+        companyHandle: "c2"
+      },
+      {
+        id: expect.any(Number),
+        title: "j3",
+        salary: 300000,
+        equity: "0.03",
+        // equity: 0.03,
+        companyHandle: "c3"
+      },
+    ]);
+  });
+
+  // console.log(idArr);
+  test("no result: all filter terms", async function () {
+    let jobs = await Job.findAll({
+      title: "j",
+      minSalary: 400000,
+      hasEquity: true
+    });
+    expect(jobs).toEqual([ ]);
+  });
+
+
 });
 
 /************************************** get */

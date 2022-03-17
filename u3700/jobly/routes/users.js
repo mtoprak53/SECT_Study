@@ -44,6 +44,35 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 });
 
 
+/** POST / { user }  => { applied: jobId }
+ *
+ * Adds a new user. This is not the registration endpoint --- instead, this is
+ * only for admin users to add new users. The new user being added can be an
+ * admin.
+ *
+ * This returns the newly created user and an authentication token for them:
+ *  {user: { username, firstName, lastName, email, isAdmin }, token }
+ *
+ * Authorization required: admin
+ **/
+
+router.post("/:username/jobs/:id", ensureAdminOrOwner, async function (req, res, next) {
+  try {
+    // const validator = jsonschema.validate(req.body, userNewSchema);
+    // if (!validator.valid) {
+    //   const errs = validator.errors.map(e => e.stack);
+    //   throw new BadRequestError(errs);
+    // }
+
+    const application = await User.applyJob(req.params.username, req.params.id);
+    // const token = createToken(user);
+    return res.status(201).json({ applied: req.params.id });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  *
  * Returns list of all users.

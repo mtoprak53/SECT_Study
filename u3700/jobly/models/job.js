@@ -56,6 +56,74 @@ class Job {
       // jobsRes.rows.map(j => console.log(`job id => ${j.id}`));
       return jobsRes.rows;
     }
+
+    // WITH FILTER
+    else {
+      const keys = Object.keys(queryString);
+      const arr = ["WHERE", "AND", "AND"];
+      const universe = new Set(["title", "minSalary", "hasEquity"]);
+
+      // BadRequestError if there is any inappropriate filter terms
+      const set1 = new Set(keys);
+      // console.log(set1);
+      // console.log(universe);
+      // console.log(difference(set1, universe));
+      if (difference(set1, universe).size > 0) {
+        throw new BadRequestError("There is at least one inappropriate filter term in the query.");
+      }
+
+      // BadRequestError if there is any inappropriate filter term value
+      // console.log(typeof queryString["hasEquity"]);
+
+      const titleInKeys =  keys.includes("title");
+      const minSalaryInKeys = keys.includes("minSalary");
+      const hasEquityInKeys = keys.includes("hasEquity");
+      const titleValueIsString = typeof queryString["title"] !== "string";
+      const minSalaryValueIsNumber = typeof queryString["minSalary"] !== "number";
+      const hasEquityValueIsBoolean = typeof queryString["hasEquity"] !== "boolean";
+
+      // console.log(
+      //   titleInKeys, 
+      //   minSalaryInKeys,
+      //   hasEquityInKeys,
+      //   titleValueIsString, 
+      //   minSalaryValueIsNumber, 
+      //   hasEquityValueIsBoolean
+      // );
+
+      const condition1 = titleInKeys && titleValueIsString;
+      const condition2 = minSalaryInKeys && minSalaryValueIsNumber;
+      const condition3 = hasEquityInKeys && hasEquityValueIsBoolean;
+
+      // console.log(condition1, condition2, condition3);
+      if (condition1 || condition2 || condition3) {
+        throw new BadRequestError("There is at least one inappropriate filter term value in the query.");
+      }
+
+      // Build the SQL query
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] === "title") {
+          querySql += ` ${arr[i]} LOWER(title) LIKE LOWER($${i+1})`;
+        }
+        if (keys[i] === "minSalary") {
+          querySql += ` ${arr[i]} salary >= $${i+1}`;
+        }
+        if (keys[i] === "hasEquity" && queryString[keys[i]] === true) {
+          querySql += ` ${arr[i]} equity > 0`;
+        }
+      }
+
+      querySql += ` ORDER BY id`;
+      // console.log(querySql);
+      // console.log(Object.values(queryString));
+      const valArr = Object.entries(queryString)
+          .map(ent => ent[0] === "title" ? `%${ent[1]}%` : ent[1])
+          .filter(el => el !== true);
+      // console.log(valArr);
+      // console.log(querySql);
+      const jobsRes = await db.query(querySql, valArr);
+      return jobsRes.rows;
+    }
   }
 
   /** Given a job id, return data about job.

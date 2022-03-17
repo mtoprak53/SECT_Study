@@ -63,19 +63,19 @@ async function commonBeforeAll() {
   });
 
   await Job.create({
-    title: "J1",
+    title: "j1",
     salary: 150000,
     equity: 0.031,
     companyHandle: "c1"
   });
   await Job.create({
-    title: "J2",
+    title: "j2",
     salary: 160000,
     equity: 0.032,
     companyHandle: "c2"
   });
   await Job.create({
-    title: "J3",
+    title: "j3",
     salary: 170000,
     equity: 0.033,
     companyHandle: "c3"
@@ -99,6 +99,24 @@ const u1Token = createToken({ username: "u1", isAdmin: false });
 const u2Token = createToken({ username: "u2", isAdmin: true });
 const u3Token = createToken({ username: "u3", isAdmin: false });
 
+async function jobIds() {
+  const job1 = await db.query(`SELECT id 
+                               FROM jobs 
+                               WHERE title = "j1"`);
+  
+  const job2 = await db.query(`SELECT id 
+                               FROM jobs 
+                               WHERE title = "j2"`);
+  
+  const job3 = await db.query(`SELECT id 
+                               FROM jobs 
+                               WHERE title = "j3"`);
+
+  return [job1.rows[0].id, job2.rows[0].id, job3.rows[0].id];
+}
+
+[ jobId1, jobId2, jobId3 ] = jobIds()
+
 
 module.exports = {
   commonBeforeAll,
@@ -108,4 +126,7 @@ module.exports = {
   u1Token,
   u2Token,
   u3Token,
+  jobId1, 
+  jobId2,
+  jobId3
 };

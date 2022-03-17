@@ -7,12 +7,17 @@ const {
 } = require("../expressError");
 const db = require("../db.js");
 const User = require("./user.js");
+const Job = require("./job.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  jobId1, 
+  jobId2,
+  jobId3
 } = require("./_testCommon");
+const app = require("../app");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -132,14 +137,27 @@ describe("findAll", function () {
 /************************************** get */
 
 describe("get", function () {
+  const newJob = {
+    title: "new-job",
+    salary: 180000,
+    equity: 0.034,
+    companyHandle: "c2"
+  };
+
   test("works", async function () {
+    let job = await Job.create(newJob);
+    // console.log(job);
+    let application = await User.applyJob("u1", job.id);
+    // console.log(application);
     let user = await User.get("u1");
+    // console.log(user);
     expect(user).toEqual({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [expect.any(Number), job.id]
     });
   });
 
@@ -228,3 +246,33 @@ describe("remove", function () {
     }
   });
 });
+
+/************************************** applyJob */
+
+describe("applyJob", function () {
+  const newJob = {
+    title: "newTitle",
+    salary: 120000,
+    equity: 0.003,
+    companyHandle: "c2"
+  };
+
+  test("works", async function () {
+    let job = await Job.create(newJob);
+    let application = await User.applyJob("u1", job.id);
+    expect(application).toEqual({
+      jobId: job.id,
+      username: "u1"
+    });
+
+    const found = await db.query(
+          `SELECT * 
+           FROM applications 
+           WHERE job_id = ${job.id} 
+           AND username = $1`, 
+        ["u1"]);
+    // console.log(found.rows);    
+    expect(found.rows.length).toEqual(1);
+  });
+});
+
