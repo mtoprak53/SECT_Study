@@ -11,8 +11,8 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  u1Token,
-  u2Token
+  u1Token,   // user
+  u2Token,   // admin
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -36,15 +36,13 @@ describe("POST /jobs", function () {
         .send(newJob)
         .set("authorization", `Bearer ${u2Token}`);
     expect(resp.statusCode).toEqual(201);
-    expect(resp.body).toEqual(
-      {
-        job: {
-          id: expect.any(Number),
-          ...newJob,
-          equity: "0.022"
-        }
+    expect(resp.body).toEqual({
+      job: {
+        id: expect.any(Number),
+        ...newJob,
+        equity: "0.022"
       }
-    );
+    });
   });
 
   test("not admin -> unauthorized", async function () {
@@ -87,22 +85,22 @@ describe("GET /jobs", function () {
       jobs: 
           [
             {
-              id: expect.any(Number),
-              title: "J1",
+              id: 1,
+              title: "j1",
               salary: 150000,
               equity: "0.031",
               companyHandle: "c1"
             },
             {
-              id: expect.any(Number),
-              title: "J2",
+              id: 2,
+              title: "j2",
               salary: 160000,
               equity: "0.032",
-              companyHandle: "c2"
+              companyHandle: "c3"
             },
             {
-              id: expect.any(Number),
-              title: "J3",
+              id: 3,
+              title: "j3",
               salary: 170000,
               equity: "0.033",
               companyHandle: "c3"

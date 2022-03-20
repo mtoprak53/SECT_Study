@@ -44,36 +44,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 });
 
 
-/** POST / { user }  => { applied: jobId }
- *
- * Adds a new user. This is not the registration endpoint --- instead, this is
- * only for admin users to add new users. The new user being added can be an
- * admin.
- *
- * This returns the newly created user and an authentication token for them:
- *  {user: { username, firstName, lastName, email, isAdmin }, token }
- *
- * Authorization required: admin
- **/
-
-router.post("/:username/jobs/:id", ensureAdminOrOwner, async function (req, res, next) {
-  try {
-    // const validator = jsonschema.validate(req.body, userNewSchema);
-    // if (!validator.valid) {
-    //   const errs = validator.errors.map(e => e.stack);
-    //   throw new BadRequestError(errs);
-    // }
-
-    const application = await User.applyJob(req.params.username, req.params.id);
-    // const token = createToken(user);
-    return res.status(201).json({ applied: req.params.id });
-  } catch (err) {
-    return next(err);
-  }
-});
-
-
-/** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
+/** GET / => { users: [ {username, firstName, lastName, email, is_admin, jobs }, ... ] }
+ *   where jobs is [jobId, jobId, ... ]
  *
  * Returns list of all users.
  *
@@ -92,7 +64,8 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, isAdmin }
+ * Returns { username, firstName, lastName, isAdmin, jobs }
+ *   where jobs is [jobId, jobId, ... ]
  *
  * Authorization required: admin or owner
  **/
@@ -135,13 +108,32 @@ router.patch("/:username", ensureAdminOrOwner, async function (req, res, next) {
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: admin or owner
  **/
 
 router.delete("/:username", ensureAdminOrOwner, async function (req, res, next) {
   try {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+/** POST / { username, jobId }  => { applied: jobId }
+ *
+ * Applies for a job for the user.
+ * 
+ * Returns a job application message.
+ *
+ * Authorization required: admin or owner
+ **/
+
+router.post("/:username/jobs/:id", ensureAdminOrOwner, async function (req, res, next) {
+  try {
+    const application = await User.applyJob(req.params.username, req.params.id);
+    return res.status(201).json({ applied: req.params.id });
   } catch (err) {
     return next(err);
   }

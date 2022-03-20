@@ -163,16 +163,6 @@ describe("findAll", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
-
-  // test("works: no filter", async function () {
-  //   let companies = await Company.findAll();
-  //   expect(companies).toEqual();
-  // });
-
-  // test("works: no filter", async function () {
-  //   let companies = await Company.findAll();
-  //   expect(companies).toEqual();
-  // });
 });
 
 /************************************** get */
@@ -187,11 +177,10 @@ describe("get", function () {
       numEmployees: 1,
       logoUrl: "http://c1.img",
       jobs: [{
-        id: expect.any(Number),
+        id: 1,
         title: "j1",
         salary: 100000,
         equity: "0.01",
-        companyHandle: "c1", 
       }]
     });
   });

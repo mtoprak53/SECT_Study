@@ -33,7 +33,6 @@ class Job {
     const job = result.rows[0];
 
     return job;
-    // return { ...job, equity: parseFloat(job.equity) };
   }
 
   /** Find all jobs.
@@ -53,7 +52,6 @@ class Job {
     if(!queryString) {
       querySql += ` ORDER BY id`;
       const jobsRes = await db.query(querySql);
-      // jobsRes.rows.map(j => console.log(`job id => ${j.id}`));
       return jobsRes.rows;
     }
 
@@ -65,16 +63,11 @@ class Job {
 
       // BadRequestError if there is any inappropriate filter terms
       const set1 = new Set(keys);
-      // console.log(set1);
-      // console.log(universe);
-      // console.log(difference(set1, universe));
       if (difference(set1, universe).size > 0) {
         throw new BadRequestError("There is at least one inappropriate filter term in the query.");
       }
 
-      // BadRequestError if there is any inappropriate filter term value
-      // console.log(typeof queryString["hasEquity"]);
-
+      // BadRequestError if there is any inappropriate filter term values
       const titleInKeys =  keys.includes("title");
       const minSalaryInKeys = keys.includes("minSalary");
       const hasEquityInKeys = keys.includes("hasEquity");
@@ -82,20 +75,10 @@ class Job {
       const minSalaryValueIsNumber = typeof queryString["minSalary"] !== "number";
       const hasEquityValueIsBoolean = typeof queryString["hasEquity"] !== "boolean";
 
-      // console.log(
-      //   titleInKeys, 
-      //   minSalaryInKeys,
-      //   hasEquityInKeys,
-      //   titleValueIsString, 
-      //   minSalaryValueIsNumber, 
-      //   hasEquityValueIsBoolean
-      // );
-
       const condition1 = titleInKeys && titleValueIsString;
       const condition2 = minSalaryInKeys && minSalaryValueIsNumber;
       const condition3 = hasEquityInKeys && hasEquityValueIsBoolean;
 
-      // console.log(condition1, condition2, condition3);
       if (condition1 || condition2 || condition3) {
         throw new BadRequestError("There is at least one inappropriate filter term value in the query.");
       }
@@ -114,13 +97,12 @@ class Job {
       }
 
       querySql += ` ORDER BY id`;
-      // console.log(querySql);
-      // console.log(Object.values(queryString));
+
+      // map filter term values and filter out hasEquity value if exists
       const valArr = Object.entries(queryString)
           .map(ent => ent[0] === "title" ? `%${ent[1]}%` : ent[1])
-          .filter(el => el !== true);
-      // console.log(valArr);
-      // console.log(querySql);
+          .filter(el => typeof el !== "boolean");
+      
       const jobsRes = await db.query(querySql, valArr);
       return jobsRes.rows;
     }
@@ -151,6 +133,27 @@ class Job {
     if (!job) throw new NotFoundError(`No job: ${id}`);
 
     return job;
+  }
+
+  /** Given a companyHandle, return data about jobs at this company.
+   *
+   * Returns { id, title, salary, equity }
+   *
+   * Throws NotFoundError if not found.
+   **/
+
+  static async getHandle(handle) {
+    const jobRes = await db.query(
+          `SELECT id,
+                  title, 
+                  salary, 
+                  equity 
+            FROM jobs
+            WHERE company_handle = $1`,
+          [handle]);
+    const jobs = jobRes.rows;
+
+    return jobs;
   }
 
   /** Update job data with `data`.

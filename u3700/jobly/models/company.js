@@ -74,9 +74,6 @@ class Company {
 
       // BadRequestError if there is any inappropriate filter terms
       const set1 = new Set(keys);
-      // console.log(set1);
-      // console.log(universe);
-      // console.log(difference(set1, universe));
       if (difference(set1, universe).size > 0) {
         throw new BadRequestError("There is at least one inappropriate filtering term in the query.");
       }
@@ -102,8 +99,6 @@ class Company {
       }
 
       querySql += ` ORDER BY name`;
-      // console.log(querySql);
-      // console.log(Object.values(queryString));
       const valArr = Object.entries(queryString).map(ent => {
         return ent[0] === "nameLike" ? `%${ent[1]}%` : parseInt(ent[1]);
       });
@@ -136,11 +131,7 @@ class Company {
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
     const jobRes = await db.query(
-          `SELECT id,
-                  title, 
-                  salary, 
-                  equity, 
-                  company_handle AS "companyHandle" 
+          `SELECT id, title, salary, equity 
             FROM jobs 
             WHERE company_handle = $1`,
           [handle]);

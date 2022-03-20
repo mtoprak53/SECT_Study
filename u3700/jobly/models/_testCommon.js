@@ -31,30 +31,16 @@ async function commonBeforeAll() {
         await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
       ]);
 
-  const jobs = await db.query(`
-          INSERT INTO jobs(title, salary, equity, company_handle)
-          VALUES ('j1', 100000, 0.01, 'c1'),
-                 ('j2', 200000, null, 'c2'),
-                 ('j3', 300000, 0.03, 'c3')`);
+  await db.query(`
+          INSERT INTO jobs(id, title, salary, equity, company_handle)
+          VALUES (1, 'j1', 100000, 0.01, 'c1'),
+                 (2, 'j2', 200000, null, 'c2'),
+                 (3, 'j3', 300000, 0.03, 'c3')`);
 
-  const jobRes = await db.query(
-    `SELECT id, 
-            title, 
-            salary, 
-            equity, 
-            company_handle AS "companyHandle"
-     FROM jobs`
+  await db.query(`
+          INSERT INTO applications(username, job_id)
+          VALUES ('u1', 1), ('u2', 1), ('u2', 3)`
   );
-
-  const jobIds = jobRes.rows.map(j => j.id);
-
-  const applications = await db.query(`
-          INSERT INTO applications(job_id, username)
-          VALUES ($1, $2), ($3, $4), ($5, $6)`,
-        [jobIds[0], "u1", jobIds[0], "u2", jobIds[2], "u2"]
-  );
-
-  // const idArr = jobs.rows.map(j => j.id);
 }
 
 async function commonBeforeEach() {
@@ -70,35 +56,9 @@ async function commonAfterAll() {
 }
 
 
-async function jobIds() {
-  const job1 = await db.query(`SELECT id 
-                               FROM jobs 
-                               WHERE title = $1`, ["j1"]);
-  
-  const job2 = await db.query(`SELECT id 
-                               FROM jobs 
-                               WHERE title = $2`, ["j2"]);
-  
-  const job3 = await db.query(`SELECT id 
-                               FROM jobs 
-                               WHERE title = $3`, ["j3"]);
-
-  return [job1.rows[0].id, job2.rows[0].id, job3.rows[0].id];
-}
-
-console.log(`jobIds()  =>  ${jobIds()}`);
-
-// [ jobId1, jobId2, jobId3 ] = jobIds();
-// (async () => const { jobId1, jobId2, jobId3 } = await jobIds();)
-// const { jobId1, jobId2, jobId3 } = jobIds();
-
-
 module.exports = {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  jobId1, 
-  jobId2,
-  jobId3
 };

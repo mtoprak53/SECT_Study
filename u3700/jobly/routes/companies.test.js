@@ -10,8 +10,8 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  u1Token,
-  u2Token,
+  u1Token,  // user
+  u2Token,  // admin
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -191,31 +191,6 @@ describe("GET /companies", function () {
         .get("/companies?nameLike=2&minEmployees=2&maxEmployees=1");
     expect(resp.statusCode).toEqual(400);
   });
-
-  // test("ok for anon", async function () {
-  //   const resp = await request(app).get("/companies");
-  //   expect(resp.body).toEqual({
-  //     companies:
-  //         [
-  //           {
-  //             handle: "c1",
-  //             name: "C1",
-  //             description: "Desc1",
-  //             numEmployees: 1,
-  //             logoUrl: "http://c1.img",
-  //           }
-  //         ],
-  //   });
-  // });
-
-  // test("fails: test next() handler", async function () {
-  //   await db.query("DROP TABLE companies CASCADE");
-  //   const resp = await request(app)
-  //       .get("/companies")
-  //       .set("authorization", `Bearer ${u1Token}`);
-  //   expect(resp.statusCode).toEqual(500);
-  // });
-
 });
 
 /************************************** GET /companies/:handle */
@@ -224,26 +199,29 @@ describe("GET /companies/:handle", function () {
   test("works for anon", async function () {
     const resp = await request(app).get(`/companies/c1`);
     expect(resp.body).toEqual({
-      company: {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
+      handle: "c1",
+      name: "C1",
+      description: "Desc1",
+      numEmployees: 1,
+      logoUrl: "http://c1.img",
+      jobs: [{
+        id:1, 
+        title: 'j1',
+        salary: 150000,
+        equity: "0.031"
+      }]
     });
   });
 
   test("works for anon: company w/o jobs", async function () {
     const resp = await request(app).get(`/companies/c2`);
     expect(resp.body).toEqual({
-      company: {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
+      handle: "c2",
+      name: "C2",
+      description: "Desc2",
+      numEmployees: 2,
+      logoUrl: "http://c2.img",
+      jobs: []
     });
   });
 
