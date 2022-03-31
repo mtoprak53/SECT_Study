@@ -1,10 +1,10 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, 
-        NotFoundError } = require("../expressError");
+const { NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate, 
-        difference } = require("../helpers/sql");
+        sqlForGetAllJobs } = require("../helpers/sql");
+// const { difference } = require("../helpers/difference");
 
 /** Related functions for jobs. */
   
@@ -57,52 +57,8 @@ class Job {
 
     // WITH FILTER
     else {
-      const keys = Object.keys(queryString);
-      const arr = ["WHERE", "AND", "AND"];
-      const universe = new Set(["title", "minSalary", "hasEquity"]);
-
-      // BadRequestError if there is any inappropriate filter terms
-      const set1 = new Set(keys);
-      if (difference(set1, universe).size > 0) {
-        throw new BadRequestError("There is at least one inappropriate filter term in the query.");
-      }
-
-      // BadRequestError if there is any inappropriate filter term values
-      const titleInKeys =  keys.includes("title");
-      const minSalaryInKeys = keys.includes("minSalary");
-      const hasEquityInKeys = keys.includes("hasEquity");
-      const titleValueIsString = typeof queryString["title"] !== "string";
-      const minSalaryValueIsNumber = typeof queryString["minSalary"] !== "number";
-      const hasEquityValueIsBoolean = typeof queryString["hasEquity"] !== "boolean";
-
-      const condition1 = titleInKeys && titleValueIsString;
-      const condition2 = minSalaryInKeys && minSalaryValueIsNumber;
-      const condition3 = hasEquityInKeys && hasEquityValueIsBoolean;
-
-      if (condition1 || condition2 || condition3) {
-        throw new BadRequestError("There is at least one inappropriate filter term value in the query.");
-      }
-
-      // Build the SQL query
-      for (let i = 0; i < keys.length; i++) {
-        if (keys[i] === "title") {
-          querySql += ` ${arr[i]} LOWER(title) LIKE LOWER($${i+1})`;
-        }
-        if (keys[i] === "minSalary") {
-          querySql += ` ${arr[i]} salary >= $${i+1}`;
-        }
-        if (keys[i] === "hasEquity" && queryString[keys[i]] === true) {
-          querySql += ` ${arr[i]} equity > 0`;
-        }
-      }
-
-      querySql += ` ORDER BY id`;
-
-      // map filter term values and filter out hasEquity value if exists
-      const valArr = Object.entries(queryString)
-          .map(ent => ent[0] === "title" ? `%${ent[1]}%` : ent[1])
-          .filter(el => typeof el !== "boolean");
-      
+      const [querySql_, valArr] = sqlForGetAllJobs(queryString);
+      querySql += querySql_;
       const jobsRes = await db.query(querySql, valArr);
       return jobsRes.rows;
     }

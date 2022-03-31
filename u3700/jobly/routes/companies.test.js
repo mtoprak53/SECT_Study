@@ -242,13 +242,11 @@ describe("PATCH /companies/:handle", function () {
         })
         .set("authorization", `Bearer ${u2Token}`);
     expect(resp.body).toEqual({
-      company: {
-        handle: "c1",
-        name: "C1-new",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
+      handle: "c1",
+      name: "C1-new",
+      description: "Desc1",
+      numEmployees: 1,
+      logoUrl: "http://c1.img",
     });
   });
 

@@ -100,7 +100,7 @@ router.patch("/:handle", ensureAdmin, async function (req, res, next) {
     }
 
     const company = await Company.update(req.params.handle, req.body);
-    return res.json({ company });
+    return res.json(company);
   } catch (err) {
     return next(err);
   }

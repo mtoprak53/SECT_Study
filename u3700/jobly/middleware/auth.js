@@ -61,7 +61,7 @@ function ensureAdmin(req, res, next) {
  * If not, raises Unauthorized.
  */
 
-function ensureAdminOrOwner(req, res, next) {
+function ensureAdminOrOwner(req, res, next) {  // owner => curr_user
   try {
     if (!res.locals.user || 
         !(res.locals.user.username === req.params.username || 
