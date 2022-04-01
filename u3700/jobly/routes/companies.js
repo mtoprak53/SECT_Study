@@ -34,7 +34,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
     }
 
     const company = await Company.create(req.body);
-    return res.status(201).json({ company });
+    return res.status(201).json(company);
   } catch (err) {
     return next(err);
   }

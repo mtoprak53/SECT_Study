@@ -36,9 +36,7 @@ describe("POST /companies", function () {
         .send(newCompany)
         .set("authorization", `Bearer ${u2Token}`);
     expect(resp.statusCode).toEqual(201);
-    expect(resp.body).toEqual(
-      { company: newCompany }
-    );
+    expect(resp.body).toEqual(newCompany);
   });
 
   test("not admin -> unauthorized", async function () {

@@ -53,8 +53,6 @@ function sqlForGetAllCompanies(queryString) {
   const arr = ["WHERE", "AND", "AND"];
   const universe = new Set(["nameLike", "minEmployees", "maxEmployees"]);
 
-  console.log(queryString);
-
   // BadRequestError if there is any inappropriate filter terms
   const set1 = new Set(keys);
   if (difference(set1, universe).size > 0) {
