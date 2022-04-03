@@ -23,6 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # MY ADDITIONS
+.gitignore
 /public
 package-lock.json
 package.json
