@@ -1,0 +1,42 @@
+/* * {
+  border: 2px solid red;
+} */
+
+.EightBall {
+  margin: 100px;
+}
+
+.EightBall-ball {
+  width: 200px;
+  height: 200px;
+  border-radius: 100%;
+  margin: 100px;
+  text-align: center;
+  display:table-cell;
+  vertical-align: middle;
+}
+
+.EightBall-ball:hover {
+  cursor: pointer;
+}
+
+.EightBall-ball-text {
+  color: white;
+  padding: 25px;
+}
+
+.black {
+  background-color: black;
+}
+
+.green {
+  background-color: green;
+}
+
+.goldenrod {
+  background-color: goldenrod;
+}
+
+.red {
+  background-color: red;
+}

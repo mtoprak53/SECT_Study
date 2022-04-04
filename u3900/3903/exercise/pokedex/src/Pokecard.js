@@ -1,7 +1,6 @@
 import React from "react";
 import "./Pokecard.css"
 
-
 const Pokecard = ({ id, name, type, base_experience }) => (
   <div className="Pokecard">
     <h3 className="Pokecard-title">{ name }</h3>
