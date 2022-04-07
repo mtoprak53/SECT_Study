@@ -1,8 +1,10 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { BadRequestError, 
+        NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate, 
+        sqlForGetAllCompanies } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -49,16 +51,28 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
-    const companiesRes = await db.query(
-          `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           ORDER BY name`);
-    return companiesRes.rows;
+  static async findAll(queryString) {
+    let querySql = `SELECT handle, 
+                           name,
+                           description, 
+                           num_employees AS "numEmployees", 
+                           logo_url AS "logoUrl" 
+                    FROM companies`
+
+    // NO FILTER
+    if (!queryString) {
+      querySql += ` ORDER BY name`;
+      const companiesRes = await db.query(querySql);
+      return companiesRes.rows;
+    }
+
+    // WITH FILTER
+    else {
+      const [querySql_, valArr] = sqlForGetAllCompanies(queryString);
+      querySql += querySql_;
+      const companiesRes = await db.query(querySql, valArr);
+      return companiesRes.rows;
+    }
   }
 
   /** Given a company handle, return data about company.
@@ -84,7 +98,15 @@ class Company {
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
-    return company;
+    const jobRes = await db.query(
+          `SELECT id, title, salary, equity 
+            FROM jobs 
+            WHERE company_handle = $1`,
+          [handle]);
+    
+    const jobs = jobRes.rows;
+
+    return { ...company, jobs };
   }
 
   /** Update company data with `data`.

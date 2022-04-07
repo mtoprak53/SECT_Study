@@ -7,12 +7,14 @@ const {
 } = require("../expressError");
 const db = require("../db.js");
 const User = require("./user.js");
+const Job = require("./job.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
 } = require("./_testCommon");
+const app = require("../app");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -117,6 +119,7 @@ describe("findAll", function () {
         lastName: "U1L",
         email: "u1@email.com",
         isAdmin: false,
+        jobs: [1]
       },
       {
         username: "u2",
@@ -124,6 +127,7 @@ describe("findAll", function () {
         lastName: "U2L",
         email: "u2@email.com",
         isAdmin: false,
+        jobs: [1, 3]
       },
     ]);
   });
@@ -140,6 +144,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [1]
     });
   });
 
@@ -164,18 +169,18 @@ describe("update", function () {
   };
 
   test("works", async function () {
-    let job = await User.update("u1", updateData);
-    expect(job).toEqual({
+    let user = await User.update("u1", updateData);
+    expect(user).toEqual({
       username: "u1",
       ...updateData,
     });
   });
 
   test("works: set password", async function () {
-    let job = await User.update("u1", {
+    let user = await User.update("u1", {
       password: "new",
     });
-    expect(job).toEqual({
+    expect(user).toEqual({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
@@ -228,3 +233,69 @@ describe("remove", function () {
     }
   });
 });
+
+/************************************** applyJob */
+
+describe("applyJob", function () {
+  test("works", async function () {
+    let application = await User.applyJob("u1", 3);
+    expect(application).toEqual({
+      username: "u1",
+      jobId: 3,
+    });
+
+    const found = await db.query(
+          `SELECT * 
+           FROM applications 
+           WHERE username = 'u1' 
+           AND job_id = 3`);
+    expect(found.rows.length).toEqual(1);
+  });
+
+  test("bad request if dupe", async function () {
+    try {
+      await User.applyJob("u1", 3);
+      await User.applyJob("u1", 3);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("bad request if bad username", async function () {
+    try {
+      await User.applyJob("", 3);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("bad request if bad jobId", async function () {
+    try {
+      await User.applyJob("u1", "not-number");
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("not found if no such user", async function () {
+    try {
+      await User.applyJob("u4", 3);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("not fount if no such job", async function () {
+    try {
+      await User.applyJob("u1", 4);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+

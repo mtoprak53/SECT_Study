@@ -3,6 +3,7 @@
 const db = require("../db.js");
 const User = require("../models/user");
 const Company = require("../models/company");
+const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 
 async function commonBeforeAll() {
@@ -50,7 +51,7 @@ async function commonBeforeAll() {
     lastName: "U2L",
     email: "user2@user.com",
     password: "password2",
-    isAdmin: false,
+    isAdmin: true,
   });
   await User.register({
     username: "u3",
@@ -60,6 +61,33 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: false,
   });
+
+  const j1 = await Job.create({
+    title: "j1",
+    salary: 150000,
+    equity: 0.031,
+    companyHandle: "c1"
+  });
+  const j2 = await Job.create({
+    title: "j2",
+    salary: 160000,
+    equity: 0.032,
+    companyHandle: "c3"
+  });
+  const j3 = await Job.create({
+    title: "j3",
+    salary: 170000,
+    equity: 0.033,
+    companyHandle: "c3"
+  });
+
+  await db.query(`UPDATE jobs SET id = 1 WHERE title = 'j1'`);
+  await db.query(`UPDATE jobs SET id = 2 WHERE title = 'j2'`);
+  await db.query(`UPDATE jobs SET id = 3 WHERE title = 'j3'`);
+
+  await User.applyJob("u1", 1);
+  await User.applyJob("u1", 2);
+  await User.applyJob("u3", 3);
 }
 
 async function commonBeforeEach() {
@@ -76,6 +104,8 @@ async function commonAfterAll() {
 
 
 const u1Token = createToken({ username: "u1", isAdmin: false });
+const u2Token = createToken({ username: "u2", isAdmin: true });
+const u3Token = createToken({ username: "u3", isAdmin: false });
 
 
 module.exports = {
@@ -84,4 +114,6 @@ module.exports = {
   commonAfterEach,
   commonAfterAll,
   u1Token,
+  u2Token,
+  u3Token,
 };
