@@ -1,0 +1,12 @@
+.Todo {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 5px;
+}
+
+.Todo-btn {
+  margin-right: 10px;
+  padding: 0;
+  width: 18px;
+  height:18px;
+}
