@@ -1,0 +1,14 @@
+h3 {
+  background-color: greenyellow;
+}
+
+.CardDrawer {
+  background-color: limegreen;
+  height: 600px;
+}
+
+.CardDrawer-card-container {
+  display: flex;
+  justify-content: center;
+  padding: 60px;
+}
