@@ -1,0 +1,20 @@
+.Navbar {
+  background-color: dodgerblue;
+  padding: 1rem;
+}
+
+.Navbar a {
+  box-sizing: border-box;
+  text-decoration: none;
+  font-size: 1.5rem;
+  margin: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.Navbar a.active {
+  color: white;
+}
+
+.Navbar a:hover {
+  border: 2px solid skyblue;
+}
