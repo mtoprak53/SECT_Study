@@ -1,0 +1,38 @@
+.Nav {
+  display: flex;
+  justify-content: center;
+  list-style-type: none;
+  margin: 10;
+  padding: 0;
+  height: 60px;
+  width: 80vw;
+  border: 2px solid burlywood;
+  border-radius: 10px;
+}
+
+.Nav li {
+  margin: auto 10px;
+  /* border: 1px solid green; */
+  width: 150px;
+}
+
+.Nav-link {
+  /* border: 1px solid green; */
+  display: block;
+}
+
+.Nav-link:visited {
+  text-decoration: none;
+  color: #000;
+}
+
+.Nav-link:link {
+  text-decoration: none;
+}
+
+.Nav-link:hover {
+  text-decoration: none;
+  /* color: red; */
+  font-size: larger;
+  background-color: aliceblue;
+}

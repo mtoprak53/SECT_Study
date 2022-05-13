@@ -1,0 +1,14 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.App-Nav {
+  height: 0.4vw;
+}
+
+/* .App-Routes {
+
+} */

@@ -1,0 +1,29 @@
+.DogList {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  border: 2px solid burlywood;
+  border-radius: 10px;
+  /* width: fit-content; */
+  width: 80vw;
+
+  /* padding: 0px; */
+
+}
+
+.DogList-link {
+  margin: 10px;
+  text-decoration: none;
+  background-color: beige;
+  width: 25vw;
+}
+
+.DogList img {
+  max-width: 200px;
+  border-radius: 10px;
+}
+
+.DogList-link:visited {
+  text-decoration: none;
+  color: #000;
+}

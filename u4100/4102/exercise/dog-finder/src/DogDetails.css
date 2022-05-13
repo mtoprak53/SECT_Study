@@ -1,0 +1,19 @@
+.DogDetails {
+  display: flex;
+  justify-content: center;
+}
+
+.DogDetails img {
+  max-width: 200px;
+  border-radius: 10px;
+  width: 40vw;
+}
+
+.DogDetails-info {
+  text-align: left;
+  width: 60vw;
+}
+
+.DogDetails-name-age {
+  margin-left: 40px;
+}
