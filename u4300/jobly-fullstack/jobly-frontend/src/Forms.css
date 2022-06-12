@@ -1,0 +1,24 @@
+.Forms {
+  margin: 0 auto;
+  padding: 0 25px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.Forms-Form {
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.Forms-Form-Button {
+  display: flex;
+  justify-content: end;
+}
+
+.label {
+  font-weight: bold;
+}

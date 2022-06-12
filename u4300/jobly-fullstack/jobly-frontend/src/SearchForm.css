@@ -1,0 +1,9 @@
+.SearchForm-Form {
+  margin-bottom: 2rem;
+}
+
+.SearchForm-FormGroup {
+  /* margin: 0 20vw; */
+  display: flex;
+  gap: 10px;
+}

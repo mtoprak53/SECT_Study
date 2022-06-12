@@ -1,0 +1,35 @@
+.CompanyCard {
+  margin: auto;
+  /* width: 60vw; */
+  padding: 0 0 15px 0;
+}
+
+.CompanyCard-div {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  /* grid-auto-rows: minmax(100px, auto); */
+  margin-bottom: 1rem;
+  /* border: 1px solid red; */
+  text-decoration: none;
+}
+
+.CompanyCard-div img {
+  grid-column: 4;
+  grid-row: 1;
+  /* width: 50%; */
+  width: 60px;
+  display: block;
+  margin-left: auto;
+  /* margin-right: auto; */
+}
+
+.CompanyCard-CardTitle {
+  grid-column: 1 / 4;
+  grid-row: 1;
+  text-align: left;
+}
+
+.CompanyCard-CardText {
+  text-align: left;
+}

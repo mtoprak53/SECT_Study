@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+}
+
+.App main {
+  margin: 4rem 0;
+}
+
+.App-loading {
+  color: salmon;
+  text-align: center;
+  margin: 40vh 0;
+  font-size: 4rem;
+}
+

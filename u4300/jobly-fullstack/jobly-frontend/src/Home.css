@@ -1,0 +1,24 @@
+.Home {
+  padding: 0 20vw;
+}
+
+.Home-buttons {
+  margin: 0 15vw;
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: center;
+
+
+}
+
+.Home-button {
+  margin: 0 20px;
+  /* border: 1px solid green; */
+
+
+}
+
+Button {
+  margin: 10px;
+  width: 100px;
+}

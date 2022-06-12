@@ -1,0 +1,25 @@
+.JobCard {
+  margin: auto;
+  width: 60vw;
+  padding: 0 0 15px 0;
+  text-align: left;
+}
+
+
+.JobCard-CardTitle {
+  grid-column: 1 / 4;
+  grid-row: 1;
+}
+
+/* .JobCard-CardSubtitle {
+
+} */
+
+.JobCard-Button {
+  margin-left: auto;
+  border: 1px solid red;
+}
+
+.button {
+  text-align: right;
+}
