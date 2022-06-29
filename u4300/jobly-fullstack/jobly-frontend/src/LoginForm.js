@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Alert, Form, FormGroup, Label, Input, Button } from "reactstrap";
 import "./Forms.css";
+
+let warning = false;
 
 const LoginForm = ({ login }) => {
   const history = useHistory();
@@ -20,7 +22,11 @@ const LoginForm = ({ login }) => {
 
   const handleSubmit = evt => {
     evt.preventDefault();
-    login(formData);
+    const resLogin = login(formData);
+    if(!resLogin) {
+      warning = true;
+      return;
+    };
     history.push("/");
   }
 
@@ -53,7 +59,13 @@ const LoginForm = ({ login }) => {
               onChange={handleChange}
             />
           </FormGroup>
-        
+
+          {warning ?
+          <Alert color="danger">
+            Invalid username/password
+          </Alert> : null
+          }
+
           <div className="Forms-Form-Button">
             <Button className="button primary" color="primary" type="submit">
               Submit

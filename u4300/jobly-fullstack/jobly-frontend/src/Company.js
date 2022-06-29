@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+// import app from "../../jobly-backend/app";
 import JoblyApi from "./api";
 // import SearchForm from "./SearchForm";
 import JobCard from "./JobCard";
 // import "./Jobs.css";
 
-const Company = () => {
+const Company = ({ applications, applyJob }) => {
   let { handle } = useParams();
 
   const [isLoading, setIsLoading] = useState(true);
   const [company, setCompany] = useState([]);
+  
+  const appSet = new Set(applications);
 
   useEffect(() => {
     async function getCompany() {
@@ -32,7 +35,15 @@ const Company = () => {
       </div>
       
       {company.jobs.map(job => 
-        <JobCard job={job} inCompany="true" />
+        <JobCard 
+          // username={username} 
+          job={job} 
+          // applications={applications} 
+          isApplied = {appSet.has(job.id)} 
+          applyJob={applyJob} 
+          inCompany="true" 
+          key={job.id} 
+        />
       )}
     </div>
   )

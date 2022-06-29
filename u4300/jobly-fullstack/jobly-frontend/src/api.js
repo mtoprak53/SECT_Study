@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+// const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+const BASE_URL = process.env.REACT_APP_BASE_URL || "http://192.168.1.9:3001";
 // const BASE_URL = "http://192.168.1.9:3001";
 
 /** API Class.
@@ -64,25 +65,74 @@ class JoblyApi {
   // static async loginUser(username="testuser", password="password") {
   // static async loginUser(username="momo", password="momo123") {
   static async loginUser(username, password) {
-    const res = await this.request("auth/token", { username, password }, "post");
+    try {
+      const res = await this.request("auth/token", { username, password }, "post");
+      this.token = res.token;
+      return res.token;
+    } catch(err) {
+      console.log("### loginUser ERROR ###");
+      // console.error(err);
+      return false;
+    };
     // const { token } = res;
     // console.log(token);
-    this.token = res.token;
-    return res.token;
   }
 
   static async signupUser(username, password, firstName, lastName, email) {
-    const res = await this.request("auth/register/", {
-      username,
-      password,
-      firstName,
-      lastName,
-      email
-    }, "post");
+
+    try {
+      const res = await this.request("auth/register/", {
+        username,
+        password,
+        firstName,
+        lastName,
+        email
+      }, "post");
+      this.token = res.token;
+      return res.token;
+    } catch(err) {
+      console.log("### signupUser ERROR ###");
+      // console.error(err);
+      return false;
+    };
+
     // console.log("API signupUser method | res:");
     // console.log(res);
-    return null;
+    // return null;
   }
+
+  static async getUser(username) {
+    const res = await this.request(`users/${username}`);
+    return res.user;
+  }
+
+
+
+  static async updateUser(username, password, firstName, lastName, email) {
+    try {
+      const res = await this.request(`users/${username}`, {
+        firstName,
+        lastName,
+        password,
+        email
+      }, "patch");
+      // this.token = res.token;
+      return res;
+    } catch(err) {
+      console.log("### updateUser ERROR ###");
+      // console.error(err);
+      return false;
+    };
+  };
+
+  static async applyToTheJob(username, jobId) {
+    // const res = await this.request(`users/${username}/jobs/${id}`);
+    await this.request(`users/${username}/jobs/${jobId}`, { username, jobId }, "post");
+    // return res.user;
+  }
+
+
+
 }
 
 // // for now, put token ("testuser" / "password" on class)

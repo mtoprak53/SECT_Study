@@ -5,14 +5,6 @@ import "./Home.css";
 
 const Home = ({ signedIn=false, user }) => {
 
-  // useEffect(() => {
-  //   console.log("Home Component useEffect");
-
-  //   console.log(`user (useEffect) => ${user}`);
-  // }, [user]);
-
-  // console.log(`user => ${user}`);
-
   return (
     <div className="Home">
       <h1>Jobly</h1>

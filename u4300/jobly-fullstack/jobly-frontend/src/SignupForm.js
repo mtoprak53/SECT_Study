@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Form, FormFeedback, FormGroup, Label, Input, Button } from "reactstrap";
 import "./Forms.css";
 
 const SignupForm = ({ signup }) => {
@@ -54,7 +54,12 @@ const SignupForm = ({ signup }) => {
               name="password"
               type="password"
               onChange={handleChange}
+              // valid={false}
+              // invalid={false}
             />
+            {/* <FormFeedback valid>
+              Sweet! that name is available
+            </FormFeedback> */}
           </FormGroup>
 
           

@@ -12,7 +12,7 @@ const Companies = ({ companies, searchCompanies }) => {
       <SearchForm searchItems={searchCompanies} />
       {companies.map(co => 
         <Link to={`/companies/${co.handle}`} className="Companies-Link">
-          <CompanyCard company={co} />
+          <CompanyCard company={co} key={co.id} />
         </Link>
       )}
     </div>

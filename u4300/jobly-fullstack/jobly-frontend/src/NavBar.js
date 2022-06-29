@@ -1,42 +1,73 @@
 import React from "react";
 import "./NavBar.css";
 import { NavLink } from "react-router-dom";
-import { Container, Navbar, Nav, NavItem, Row, Col} from "reactstrap";
+import { Container, Navbar, Nav, NavbarBrand, NavItem, Row, Col} from "reactstrap";
 
-const NavBar = ({ signedIn=false, user=null }) => {
+const NavBar = ({ signedIn=false, username=null, user}) => {
+  user = JSON.parse(user);
   return (
     <div>
-      <Navbar expand="md">
-        <Row>
-          <Col>
+      {/* <Navbar expand="md"> */}
+{/* 
+      <NavbarBrand href="/">
+        Jobly
+      </NavbarBrand> */}
+      <Navbar>
+        {/* <Row> */}
+          {/* <Col>
             <NavLink exact to="/" className="navbar-brand">
               Jobly
             </NavLink>
-          </Col>
-          <Col>
+          </Col> */}
+          {/* <Col> */}
+            <NavbarBrand href="/">
+              Jobly
+            </NavbarBrand>
+
+            {/* <Nav className="mr-auto" navbar> */}
+            {/* <Nav expand="md" navbar> */}
+              {/* <Row>
+                <Col xs="">
+                  <p>{user.username}</p>
+                </Col>
+                <Col xs="">
+                  <p>{user.firstName}</p>
+                </Col>
+                <Col xs="">
+                  <p>{user.lastName}</p>
+                </Col>
+                <Col xs="">
+                  <p>{user.email}</p>
+                </Col>
+              </Row>
+            </Nav> */}
+
+          {/* </Col>
+          <Col> */}
             {
               signedIn
               ? 
-              <Nav className="ml-auto" navbar>
+              <Nav className="mr-auto" navbar>
+              {/* <Nav expand="md" navbar> */}
                 <Row>
-                  <Col>
+                  <Col xs="">
                     <NavItem>
                       <NavLink to="/companies">Companies</NavLink>
                     </NavItem>
                   </Col>
-                  <Col>
+                  <Col xs="">
                     <NavItem>
                       <NavLink to="/jobs">Jobs</NavLink>
                     </NavItem>
                   </Col>
-                  <Col>
+                  <Col xs="">
                     <NavItem>
                       <NavLink to="/profile">Profile</NavLink>
                     </NavItem>
                   </Col>
-                  <Col>
+                  <Col xs="">
                     <NavItem>
-                      <NavLink to="/logout">Logout {user}</NavLink>
+                      <NavLink to="/logout">Logout {username}</NavLink>
                     </NavItem>
                   </Col>
                 </Row>
@@ -57,11 +88,12 @@ const NavBar = ({ signedIn=false, user=null }) => {
                 </Row>
               </Nav>
             }
-          </Col>
-        </Row>
+          {/* </Col>
+        </Row> */}
       </Navbar>
+
       <Container>
-        <Row>
+        {/* <Row>
           <Col className="bg-light border">
             .col
           </Col>
@@ -179,7 +211,7 @@ const NavBar = ({ signedIn=false, user=null }) => {
           >
             .col-sm-auto .offset-sm-1
           </Col>
-        </Row>
+        </Row> */}
       </Container>
     </div>
   )
