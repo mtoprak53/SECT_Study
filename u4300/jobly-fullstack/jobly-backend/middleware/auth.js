@@ -42,7 +42,6 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
-
 /** Middleware to use when they be logged in as an admin user.
  *
  *  If not, raises Unauthorized.

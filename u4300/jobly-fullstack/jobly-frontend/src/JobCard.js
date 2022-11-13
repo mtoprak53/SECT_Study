@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import JoblyApi from "./api";
+import React from "react";
+// import JoblyApi from "./api";
 import "./JobCard.css";
 
 import {
@@ -24,7 +24,7 @@ const JobCard = ({ job, applyJob, isApplied=false, inCompany=false }) => {
   // };
 
   // TODO: A FUNCTION TO CHECK IF IT IS APPLIED EARLIER
-  if (job.id)
+  // if (job.id)
 
   return (
     <div className="JobCard">

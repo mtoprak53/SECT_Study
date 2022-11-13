@@ -30,7 +30,8 @@ const CompanyCard = ({ company }) => {
               {company.name}              
             </CardTitle>
             <img 
-              src={logoObj[company.logoUrl]}
+              src={logoObj[company.logoUrl]} 
+              alt=""
             />
           </div>
           <CardText className="CompanyCard-CardText">{company.description}</CardText>
